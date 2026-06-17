@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soft Aero OS - Control Center</title>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  overflow:hidden;
+}
+
+/* ================= DESKTOP ================= */
+#desktop{
+  width:100vw;
+  height:100vh;
+  background:linear-gradient(135deg,#dff6ff,#f7fbff);
+  position:relative;
+  display:none;
+}
+
+/* topbar */
+#topbar{
+  position:absolute;
+  top:0;
+  width:100%;
+  height:32px;
+  background:rgba(255,255,255,0.55);
+  backdrop-filter:blur(18px);
+  display:flex;
+  justify-content:space-between;
+  padding:0 10px;
+  font-size:12px;
+  align-items:center;
+}
+
+/* icons */
+.icon{
+  position:absolute;
+  width:70px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.tile{
+  width:52px;
+  height:52px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.7);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* ================= WINDOWS ================= */
+.window{
+  position:absolute;
+  width:360px;
+  height:380px;
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(20px);
+  border-radius:14px;
+  display:none;
+  box-shadow:0 20px 50px rgba(0,0,0,0.15);
+  overflow:hidden;
+}
+
+.titlebar{
+  height:34px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 10px;
+  background:rgba(255,255,255,0.7);
+  cursor:grab;
+  font-size:12px;
+}
+
+/* ================= RIGHT CONTROL CENTER ================= */
+#rightPanel{
+  position:absolute;
+  right:20px;
+  top:45px;
+  width:190px;
+
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.card{
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(18px);
+  border-radius:14px;
+  padding:10px;
+  font-size:12px;
+}
+
+textarea,input{
+  width:100%;
+  border:none;
+  border-radius:10px;
+  padding:6px;
+  outline:none;
+  resize:none;
+}
+
+.item{
+  background:white;
+  margin-top:5px;
+  padding:5px;
+  border-radius:10px;
+  font-size:11px;
+  cursor:pointer;
+}
+
+/* ================= LOGIN ================= */
+#login{
+  position:absolute;
+  width:100vw;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#e8f7ff,#ffffff);
+}
+
+.loginBox{
+  width:240px;
+  padding:18px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(20px);
+  text-align:center;
+}
+
+#pass{
+  width:100%;
+  padding:10px;
+  border-radius:30px;
+  border:none;
+  text-align:center;
+}
+
+/* ================= CD PLAYER (NOW CONTROL CENTER STYLE) ================= */
+#cdPlayer{
+  width:90%;
+  height:170px;
+
+  border-radius:14px;
+  background:rgba(255,255,255,0.65);
+  backdrop-filter:blur(18px);
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-around;
+
+  padding:10px;
+}
+
+#cdDisc{
+  width:65px;
+  height:65px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff 20%,#cfd8dc 40%,#90a4ae);
+  border:2px solid rgba(255,255,255,0.8);
+}
+
+.spin{
+  animation:spin 2s linear infinite;
+}
+
+@keyframes spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+
+/* EQ */
+#eq{
+  display:flex;
+  gap:2px;
+  height:18px;
+  align-items:flex-end;
+}
+
+.bar{
+  width:3px;
+  height:5px;
+  background:rgba(0,0,0,0.3);
+  border-radius:2px;
+  transition:0.1s;
+}
+
+#cdInfo{
+  font-size:11px;
+  opacity:0.7;
+  max-width:160px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+#cdControls button{
+  border:none;
+  background:white;
+  border-radius:10px;
+  padding:4px 8px;
+  cursor:pointer;
+}
+
+/* smooth feel */
+.window{
+  transition:all 0.2s ease;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="loginBox">
+    <div>Soft Aero OS</div>
+    <input id="pass" type="password" placeholder="••••••">
+    <button onclick="login()">enter</button>
+  </div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+
+<div id="topbar">
+  <div>Soft Aero OS</div>
+  <div id="time"></div>
+</div>
+
+<!-- ICONS -->
+<div class="icon" style="top:70px;left:40px;" onclick="openW('notes')">
+  <div class="tile">Notes</div>
+</div>
+
+<div class="icon" style="top:160px;left:40px;" onclick="openW('files')">
+  <div class="tile">Files</div>
+</div>
+
+<div class="icon" style="top:250px;left:40px;" onclick="openW('voice')">
+  <div class="tile">Voice</div>
+</div>
+
+<!-- RIGHT CONTROL CENTER -->
+<div id="rightPanel">
+
+  <!-- VOICE -->
+  <div class="card">
+    🎤 Voice
+    <button onclick="startRec()">record</button>
+    <button onclick="stopRec()">stop</button>
+    <audio id="audio" controls></audio>
+  </div>
+
+  <!-- CD PLAYER -->
+  <div id="cdPlayer">
+
+    <div id="cdDisc"></div>
+
+    <div id="eq">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+
+    <div id="cdInfo">no song</div>
+
+    <input type="file" id="audioFile" accept="audio/*" hidden>
+
+    <div id="cdControls">
+      <button onclick="pickSong()">＋</button>
+      <button onclick="toggleCD()">▶</button>
+    </div>
+
+    <audio id="cdAudio"></audio>
+
+  </div>
+
+  <!-- NOTES -->
+  <div class="card">
+    💌 Notes
+    <textarea id="noteInput"></textarea>
+    <button onclick="addNote()">add</button>
+    <div id="noteList"></div>
+  </div>
+
+  <!-- FILES -->
+  <div class="card">
+    📁 Files
+    <input id="fileName" placeholder="name">
+    <textarea id="fileData"></textarea>
+    <button onclick="saveFile()">save</button>
+    <div id="fileList"></div>
+  </div>
+
+</div>
+
+<!-- WINDOWS -->
+<div class="window" id="notes">
+  <div class="titlebar" onmousedown="dragStart(event,'notes')">
+    Notes <span onclick="closeW('notes')">x</span>
+  </div>
+</div>
+
+<div class="window" id="files">
+  <div class="titlebar" onmousedown="dragStart(event,'files')">
+    Files <span onclick="closeW('files')">x</span>
+  </div>
+</div>
+
+<div class="window" id="voice">
+  <div class="titlebar" onmousedown="dragStart(event,'voice')">
+    Voice <span onclick="closeW('voice')">x</span>
+  </div>
+</div>
+
+</div>
+
+<script>
+
+/* LOGIN */
+function login(){
+  if(document.getElementById("pass").value==="1234"){
+    document.getElementById("login").style.display="none";
+    document.getElementById("desktop").style.display="block";
+  }
+}
+
+/* CLOCK */
+setInterval(()=>{
+  document.getElementById("time").innerText=new Date().toLocaleTimeString();
+},1000);
+
+/* WINDOWS CENTER */
+function openW(id){
+  let w=document.getElementById(id);
+  w.style.display="block";
+  w.style.left=(window.innerWidth-w.offsetWidth)/2+"px";
+  w.style.top=(window.innerHeight-w.offsetHeight)/2+"px";
+}
+
+function closeW(id){
+  document.getElementById(id).style.display="none";
+}
+
+/* DRAG */
+let win=null,ox=0,oy=0;
+
+function dragStart(e,id){
+  win=document.getElementById(id);
+  ox=e.clientX-win.offsetLeft;
+  oy=e.clientY-win.offsetTop;
+}
+
+document.addEventListener("mousemove",(e)=>{
+  if(!win) return;
+  win.style.left=(e.clientX-ox)+"px";
+  win.style.top=(e.clientY-oy)+"px";
+});
+
+document.addEventListener("mouseup",()=>win=null);
+
+/* NOTES */
+let notes=JSON.parse(localStorage.getItem("notes")||"[]");
+
+function addNote(){
+  let v=document.getElementById("noteInput").value;
+  if(!v) return;
+  notes.push(v);
+  localStorage.setItem("notes",JSON.stringify(notes));
+  renderNotes();
+}
+
+function renderNotes(){
+  let b=document.getElementById("noteList");
+  b.innerHTML="";
+  notes.forEach((n,i)=>{
+    let d=document.createElement("div");
+    d.className="item";
+    d.innerText=n;
+    d.onclick=()=>{notes.splice(i,1);localStorage.setItem("notes",JSON.stringify(notes));renderNotes();}
+    b.appendChild(d);
+  });
+}
+renderNotes();
+
+/* FILES */
+let files=JSON.parse(localStorage.getItem("files")||"{}");
+
+function saveFile(){
+  let name=document.getElementById("fileName").value;
+  let data=document.getElementById("fileData").value;
+  if(!name) return;
+
+  files[name]=data;
+  localStorage.setItem("files",JSON.stringify(files));
+  renderFiles();
+}
+
+function renderFiles(){
+  let b=document.getElementById("fileList");
+  b.innerHTML="";
+  Object.keys(files).forEach(n=>{
+    let d=document.createElement("div");
+    d.className="item";
+    d.innerText=n;
+    d.onclick=()=>{
+      document.getElementById("fileName").value=n;
+      document.getElementById("fileData").value=files[n];
+    }
+    b.appendChild(d);
+  });
+}
+renderFiles();
+
+/* VOICE */
+let rec,chunks=[];
+
+function startRec(){
+  navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{
+    rec=new MediaRecorder(s);
+    chunks=[];
+    rec.start();
+    rec.ondataavailable=e=>chunks.push(e.data);
+  });
+}
+
+function stopRec(){
+  rec.stop();
+  rec.onstop=()=>{
+    let blob=new Blob(chunks);
+    document.getElementById("audio").src=URL.createObjectURL(blob);
+  }
+}
+
+/* CD + EQ */
+let cdPlaying=false;
+let audioCtx, analyser, source, dataArray;
+
+function setupAudio(audio){
+  audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  analyser=audioCtx.createAnalyser();
+  source=audioCtx.createMediaElementSource(audio);
+
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  analyser.fftSize=64;
+  dataArray=new Uint8Array(analyser.frequencyBinCount);
+
+  animateEQ();
+}
+
+function pickSong(){
+  document.getElementById("audioFile").click();
+}
+
+document.getElementById("audioFile").addEventListener("change",function(){
+  let file=this.files[0];
+  if(!file) return;
+
+  let audio=document.getElementById("cdAudio");
+  audio.src=URL.createObjectURL(file);
+
+  document.getElementById("cdInfo").innerText=file.name;
+
+  setupAudio(audio);
+});
+
+function toggleCD(){
+  let audio=document.getElementById("cdAudio");
+  let disc=document.getElementById("cdDisc");
+
+  if(!audio.src) return;
+
+  if(!cdPlaying){
+    audio.play();
+    cdPlaying=true;
+    disc.classList.add("spin");
+    audioCtx.resume();
+  }else{
+    audio.pause();
+    cdPlaying=false;
+    disc.classList.remove("spin");
+  }
+}
+
+function animateEQ(){
+  requestAnimationFrame(animateEQ);
+  if(!analyser) return;
+
+  analyser.getByteFrequencyData(dataArray);
+
+  let bars=document.querySelectorAll(".bar");
+
+  for(let i=0;i<bars.length;i++){
+    let v=dataArray[i];
+    bars[i].style.height=(v/255)*25 + 2 + "px";
+  }
+}
+
+</script>
+
+</body>
+</html>
